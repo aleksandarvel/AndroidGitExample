@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         contactImageView = (ImageView) findViewById(R.id.ImageViewContactImage);
 
         th1 = (TabHost) findViewById(R.id.tabHost);
+        //nn
         th1.setup();
         TabHost.TabSpec tabspec = th1.newTabSpec("creator");
         tabspec.setContent(R.id.creatorTab);
