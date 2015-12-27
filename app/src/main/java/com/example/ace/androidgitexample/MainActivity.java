@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         th1 = (TabHost) findViewById(R.id.tabHost);
         //nn
+        //novi
         th1.setup();
         TabHost.TabSpec tabspec = th1.newTabSpec("creator");
         tabspec.setContent(R.id.creatorTab);
