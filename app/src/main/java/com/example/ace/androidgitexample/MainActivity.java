@@ -28,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
     TabHost th1;
     ListView contactList;
     ImageView contactImageView;
-    Uri imageuri = null;
+    Uri imageuri = Uri.parse("android.resource://org.intracode.contactmanager/drawable/no_user_logo.jpg");
+    DatabaseHandler dbHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
         contactList = (ListView) findViewById(R.id.listView);
         contactImageView = (ImageView) findViewById(R.id.ImageViewContactImage);
 
+        dbHandler = new DatabaseHandler(getApplicationContext());
+
+
         th1 = (TabHost) findViewById(R.id.tabHost);
-        //nn
-        //novi
         th1.setup();
         TabHost.TabSpec tabspec = th1.newTabSpec("creator");
         tabspec.setContent(R.id.creatorTab);
@@ -88,20 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select contact image"), 1);
             }
         });
-    }
 
-        public void onActivityResult(int reqCode, int resCode, Intent data)
-    {
-        if (resCode == RESULT_OK)
-        {
-            if(reqCode == 1)
-
-            {
-                imageuri = data.getData();
-                contactImageView.setImageURI(data.getData());
-
-            }
-        }
         enterName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -126,18 +116,34 @@ public class MainActivity extends AppCompatActivity {
         {
             @Override
             public void onClick(View v) {
-                addContacts(enterName.getText().toString(), enterPhone.getText().toString(), enterEmail.getText().toString(), enterAddress.getText().toString(),imageuri);
+                addContacts(enterName.getText().toString(), enterPhone.getText().toString(), enterEmail.getText().toString(), enterAddress.getText().toString(), imageuri);
                 Toast.makeText(getApplicationContext(), enterName.getText().toString() + "has been added to your Contacts!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        populateListView();
+    }
+
+
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == RESULT_OK) {
+            if (reqCode == 1)
+
+            {
+                imageuri = data.getData();
+                contactImageView.setImageURI(data.getData());
+
+            }
+        }
     }
 
     private void addContacts(String name, String phone, String email, String address, Uri imageuri) {
-        Contacts.add(new Contact(name, phone, email, address, imageuri));
-        populateList();
+
+        dbHandler.createContact(new Contact(name, phone, email, address, imageuri));
+        populateListView();
     }
 
-    private void populateList()
+    private void populateListView()
     {
         ArrayAdapter<Contact> adapter = new ContactListAdapter();
         contactList.setAdapter(adapter);
@@ -145,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class ContactListAdapter extends ArrayAdapter<Contact> {
         public ContactListAdapter() {
-            super(MainActivity.this, R.layout.listview_item, Contacts);
+            super(MainActivity.this, R.layout.listview_item, dbHandler.getAllContacts());
         }
 
         @Override
@@ -154,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 convertView = getLayoutInflater().inflate(R.layout.listview_item, parent, false);
             }
 
-            Contact currentContact = Contacts.get(position);
+            Contact currentContact = dbHandler.getAllContacts().get(position);
 
             TextView name = (TextView) convertView.findViewById(R.id.cName);
             name.setText(currentContact.getName());

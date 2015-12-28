@@ -13,16 +13,15 @@ public class Contact {
     private Uri _image_uri;
     public int _id;
 
-    public Contact (int id, String name, String phone, String email, String address, Uri image_uri)
+    public Contact (String name, String phone, String email, String address, Uri image_uri)
     {
-        _id = id;
         _name = name;
         _phone = phone;
         _email = email;
         _address = address;
         _image_uri = image_uri;
     }
-    public int getID {return _id; }
+    public int getID() {return _id; }
 
     public String getName()
     {
